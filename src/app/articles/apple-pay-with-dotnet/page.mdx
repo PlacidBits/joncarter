@@ -1,0 +1,80 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+
+export const article = {
+ author: 'Jonathan Carter',
+ date: '2022-03-02',
+ title: 'Apple Pay With a .NET Backend',
+ description:
+ "I saw a question and submitted my solution here https://developer.apple.com/forums/thread/653672?answerId=681767022#681767022. I&apos;ll copy/paste here in case it&apos;s easier to find.",
+}
+
+export const metadata = {
+ title: article.title,
+ description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+## Requesting an Apple Pay Session in .NET
+
+I was able to get this working! The thing that's most important to know is that you CANNOT just import the .cer file from 
+your developer portal into your Windows cert store and start attaching it to your requests. In order to get it to work, I had to:
+
+1. Create a .pfx file (which will, by nature, contain both the cert and its key) as shown here: [https://blog.aclerbois.be/blog/2020/01/09/Generates-a-pfx-for-Apple-Pay](https://blog.aclerbois.be/blog/2020/01/09/Generates-a-pfx-for-Apple-Pay)
+2. Import the generated .pfx file into my Windows cert store.
+3. Attach the cert to my WebRequestHandler
+
+Here's my C# code:
+
+``` csharp
+public async Task GetSessionAsync(string validationUrl = null)
+
+  {
+    var sessionRequestBody = new ApplePaySessionRequest
+    {
+      merchantIdentifier = ConfigurationManager.AppSettings["ApplePayMerchantIdentifier"],
+      displayName = "DISPLAY NAME",
+      initiativeContext = ConfigurationManager.AppSettings["ApplePayInitiativeUrl"]
+    };
+
+    var handler = new WebRequestHandler();    
+    handler.ClientCertificates.Add(GetCertificate(MerchantIdentityCertThumbprint));      
+
+    var client = new HttpClient(handler);
+
+    var url = !string.IsNullOrWhiteSpace(validationUrl) ? validationUrl : PaymentSessionEndpointUrl;
+    var response = await client.PostAsJsonAsync(url, sessionRequestBody);
+    var applePaySession = await response.Content.ReadAsAsync<ApplePaySession>();
+    return applePaySession;
+  }
+
+  private X509Certificate2 GetCertificate(string certThumbprint)
+  {
+    X509Store userCaStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+
+    try
+    {
+      userCaStore.Open(OpenFlags.ReadOnly);
+      X509Certificate2Collection certificatesInStore = userCaStore.Certificates;
+      X509Certificate2Collection findResult = certificatesInStore.Find(X509FindType.FindByThumbprint, certThumbprint, false);
+      X509Certificate2 clientCertificate = null;
+      if (findResult.Count == 1)
+      {
+        clientCertificate = findResult[0];
+      }
+      else
+      {
+        throw new Exception("Unable to locate the correct client certificate.");
+      }
+      return clientCertificate;
+    }
+    catch
+    {
+      throw;
+    }
+    finally
+    {
+      userCaStore.Close();
+    }
+  }
+  ```

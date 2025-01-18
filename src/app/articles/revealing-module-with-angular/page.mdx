@@ -1,0 +1,194 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import helloFromModule from './revealing-module-hello.png';
+
+export const article = {
+ author: 'Jonathan Carter',
+ date: '2014-10-18',
+ title: 'Revealing Module + AngularJS',
+ description:
+ "Recently, I've been getting deep into JavaScript. It was my first programming language many years ago. Since then, some extremely interesting patterns and practices have emerged. As a primarily C# developer, I looked into the Revealing Module pattern as a way to ease myself back into JS coding in an OOP-friendly way.",
+}
+
+export const metadata = {
+ title: article.title,
+ description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+Recently, I've been getting deep into JavaScript. It was my first programming language many years ago. Since then, some extremely interesting patterns and practices have emerged. As a primarily C# developer, I looked into the Revealing Module pattern as a way to ease myself back into JS coding in an OOP-friendly way. 
+
+At work, I'm currently building a multi-module JS app with RESTful backend, using Google's AngularJS library for only one of the modules. I was worried about how it would act when integrated with an app that also makes use of jQuery and Bootstrap. As it turns out, it's totally fine! This post is an overview of my approach to modularizing Angular functionality.
+
+If you're the kind of person who likes to dig into the code before hearing the explanation, [here's a fiddle](https://jsfiddle.net/PlacidBits/888qwnpp/) that contains everything I'll be talking about.
+
+This post does assume some basic knowledge of how to set up an Angular app. Instructions for that part can be found here on [Angular's own tutorial](https://docs.angularjs.org/tutorial).
+
+## HTML Setup
+
+``` HTML
+<div class="container">
+ Main content! Non-angular pieces of our app can go here.
+ <div class="angularApp" ng-app="myApp">
+  <div ng-controller="MyController as vm">
+   {{ vm.message }}
+  </div>
+ </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+<script>
+ //Our code here
+</script>  
+```
+
+Here, we have a container div and a child div that will serve as the root of our Angular app. The `class="angularApp"` is only for styling, as you can see in the [fiddle](http://jsfiddle.net/PlacidBits/888qwnpp/) if you've looked ahead already. Inside our Angular app, we are defining a single controller using the [Controller As](http://www.johnpapa.net/angularjss-controller-as-and-the-vm-variable/) syntax, available as of Angular version 1.2.0. In our controller, we only want to print out a message. 
+
+We then include the core Angular script from Google's CDN and make a block for us to put our own script in.
+
+Once we have our markup prepped, we're ready to put some data in it!
+
+## Javascript
+
+We'll be taking a few steps here. 
+
+### Step 1 - Declaring our Module
+``` Javascript
+<script>
+ var MyModule = {
+ Main: {},
+ Angular: {}
+ };
+</script>
+```
+
+In our `<script>` block (which we should include at the bottom of our `<body>`), we first declare the module that will define our overall app. This module will include all encapsulated functionality for our Angular module as well as any others. In our example, we only have one other module called Main. Functionally speaking, this code does nothing. I do this as a habit I picked up from another coder with whom I work who suggested this as both a means of organization, as well as a sort of documentation to help to other coders who come after me. For real modular enthusiasts, this could be moved out into something like a MyModule.Config.js file to be included with other config options. 
+
+### Step 2 - Defining the Main Module's Functionality - Revealing Module Intro
+
+``` Javascript
+MyModule.Main = function () {
+ var sayHello = function () {
+  return "Hello from Main module!";
+ }
+
+ return {
+  SayHello: sayHello
+ };
+}();
+``` 
+
+Our first module! The first line redefines the Main object from Step 1 as a self-executing function which returns us our usable object. For those unfamiliar with what a self-executing function is (I surely was up until about a month ago), they key is the following on that last line:
+
+``` JavaScript
+}();
+```
+
+We know that, traditionally, a function is defined first, then called by its name later. We also know that when we call a function, we use the () to run it. Finally, we know that we can assign a function to a variable, as in jquery callback passing and the like. With the Revealing Module pattern, we assign our module variable Main to a function that is executed immediately. By doing so, Main now contains whatever value was returned from the function. That value happens to be an object with a single method on it. Here's a view of a typical object declaration that does the same as the above snippet:
+
+``` JavaScript
+var myMainObject = {
+ SayHello: function(){
+ return "Hello from Main module!";
+ }
+};
+
+MyModule.Main = myMainObject;
+``` 
+
+Either way we implement the Main module, we set ourselves up to make a nice, tidy call like so:
+
+`MyModule.Main.SayHello();`
+
+We should get back the string "Hello from Main Module!" If you're going step-by-step, try opening the dev tools in the browser of your choice and typing it into the console. You'll see your message come back! 
+
+<Image src={helloFromModule} alt="Hello from module" />
+
+Here's what our code should like like at this point:
+
+``` HTML
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Revealing Module + Angular</title>
+ </head>
+ <body>
+  <div class="container">
+  Main content! Non-angular pieces of our app can go here.
+  <div class="angularApp" ng-app="myApp">
+   <div ng-controller="MyController as vm">
+   {{ vm.message }}
+   </div>
+  </div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js">
+  </script>
+  <script>
+  var MyModule = {
+   Main: {},
+   Angular: {}
+  };
+
+  MyModule.Main = function () {
+   var sayHello = function () {
+   return "Hello from Main module!";
+   }
+
+   return {
+   SayHello: sayHello
+   };
+  }();
+  </script>  
+ </body>
+</html>
+```
+
+### Step 3 - Defining the Angular Module's Functionality
+
+``` JavaScript
+MyModule.Angular = function () {
+ "use strict";
+ 
+ //App initialization
+ var app = angular.module("myApp", []);
+
+ app.controller("MyController", MyController);
+
+ function MyController() {
+  var vm = this;
+  vm.message = MyModule.Main.SayHello();
+ }
+}();
+```
+Now that we're a bit more familiar with the Revealing Module pattern, we only have to put our hopefully-already-familiar Angular code in a new module! The only thing I'd really like to elaborate on is the Controller As syntax, linked in the intro paragraph. As John Papa explains there, we can declare a vm variable (which I like to think stands for View Model) in our controller. Once we have that handle, we just add things onto it! This replaces the need to inject the typical $scope angular module. Here's a translation from the likely more common syntax:
+
+``` JavaScript
+app.controller("MyController", function($scope){
+ $scope.message = MyModule.Main.SayHello();
+});
+```
+
+This traditional syntax won't work with our current markup. We'd have to go from
+
+``` HTML
+<div ng-controller="MyController as vm">
+ {{ vm.message }}
+</div>
+```
+
+to
+
+``` HTML
+<div ng-controller="MyController">
+ {{ message }}
+</div>
+```
+
+I prefer the Controller As syntax because of my OOP background. Either way, the crux of our exercise is that our whole app is now functional! When we run, we should see that our angular app was initialized properly and is displaying a message which it called from our Main module!
+
+All done!
+
+If you have any questions or suggestions, please comment! For those who'd like to run the code example locally, [here's a link to my github project](https://github.com/PlacidBits/codey-bits/tree/master/public/revealingModuleAngular) for this example. Pull requests are welcome for improvement!
+
+### Bonus Question to the Experienced Reader
+
+A special note, I have not found a way to stop Angular from initializing the app until after an event like a button click in our navigation. Ideally, I was looking for a way to trigger a function call like `MyModule.Angular.Init()` wherein the above runs. If anyone knows of a way, or knows of reasons why leaving it this way is a better approach, hit me on my socials, please! 

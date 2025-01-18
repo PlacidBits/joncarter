@@ -1,0 +1,52 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+
+export const article = {
+ author: 'Jonathan Carter',
+ date: '2015-03-04',
+ title: 'Quick Tip: Microsoft Web API 2 and JSONP',
+ description:
+ "Recently I had to scrape together a quick demo of an Angular app that talks to a Web API 2 solution using the jsonp() shortcut method of the $http service. As it turns out, Web API 2 does not ship with JSONP support out of the box.",
+}
+
+export const metadata = {
+ title: article.title,
+ description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+Recently I had to scrape together a quick demo of an Angular app that talks to a Web API 2 solution 
+using the [jsonp() shortcut method of the $http service](https://docs.angularjs.org/api/ng/service/$http#jsonp). As it turns out, Web API 2 does not ship 
+with JSONP support out of the box. The resulting behavior of making a call like 
+
+``` javascript
+$http.jsonp("http://api.mytestsite.com/")
+  .success(function(data){
+    console.log(data);
+  })
+  .error(function(data){
+    console.log("Error!");
+});
+```
+
+was pretty funky. Examining the Network panel in Chrome showed me a successful request with fully populated 
+response data and a 2000 status code, but my application kept falling through to the error handler and 
+logging "Error!" to the console. 
+
+It should be noted that what DOES come with packaged with Web API 2 is support for CORS, which is the true 
+solution to any problem we might have that we are solving with the JSONP workaround. Once enabled, you can 
+simply make a standard GET request to your API. Given you've [set up the Access-Control-Allow-Origin](http://www.asp.net/web-api/overview/security/enabling-cross-origin-requests-in-web-api#allowed-origins) header 
+correctly in your API solution, you'll receive nicely formatted JSON responses to your cross-origin requests.
+
+``` javascript
+$http.get("http://api.mytestsite.com/")
+  .success(function(data){
+    console.log(data);
+  })
+  .error(function(data){
+    console.log("Error!");
+});
+```
+
+There you have it! Make sure to follow that link for setting up the EnableCors attribute and you'll be on your way. If you simply must enable JSONP responses, then the [WebApiContrib.Formatting.Jsonp MediaTypeFormatter](https://github.com/WebApiContrib/WebApiContrib.Formatting.Jsonp) 
+works extremely well and is extremely easy to include in your solution

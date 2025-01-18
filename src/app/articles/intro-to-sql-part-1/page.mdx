@@ -1,0 +1,159 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import rdbms1Image from './rdbms-table-1.png'
+
+export const article = {
+ author: 'Jonathan Carter',
+ date: '2014-10-29',
+ title: 'Intro to SQL Part 1 - RDBMS and Retrieving Data',
+ description:
+  "A friend of mine asked me to do a tutorial on SQL, so here we go! This article will begin to introduce relational database concepts and will end with a few examples of how to retrieve data from a database using the select keyword. I'll stick to keeping this intro extremely basic - SQL heads please chime in with anything that might help someone just starting off in the world of databases. We will be approaching this topic from the perspective of an application developer - not a Database Administrator.",
+}
+
+export const metadata = {
+ title: article.title,
+ description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+A friend of mine asked me to do a tutorial on SQL, so here we go!  This article will begin to introduce relational database concepts and will end with a few examples of how to retrieve data from a database using the select keyword.  I'll stick to keeping this intro extremely basic - SQL heads please chime in with anything that might help someone just starting off in the world of databases.  We will be approaching this topic from the perspective of an application developer - not a Database Administrator.  
+
+## Relational Database Management Systems (RDBMS...es) - What?
+
+An [RDBMS](http://en.wikipedia.org/wiki/Relational_database_management_system) as we think of it today can be sufficiently described as a **place where you store data**. Popular RDBMSes today include Oracle, SQL Server, and MySQL.  RDBMSes usually also handle things like authentication (only allowing certain people into the system), authorization (dictating what authenticated users can do once they're in the system), performance optimization, and much more.  Our greatest concern in this article, however, is the ability that an RDBMS gives us to store and retrieve data for any applications that we might write.  
+
+## Database Structure
+
+- The RDBMS contains **databases**. 
+- Databases are comprised of **tables**. 
+- Tables contain both rows and **columns**. 
+- Columns contain **data**.
+- Just like any table you've seen, a complete set of data across columns makes a **row**. 
+
+What follows is a conceptual map of this hierarchy including a 
+table that we will be using for the rest of this example. This table represents a majority of what you're likely finding in your coursework or workplace:
+
+"PlacidBits" Database, "Writers" Table
+
+| ID | First Name | Last Name |
+|----|------------|-----------|
+| 1  | Jonathan   | Carter    |
+| 2  | Jimmy      | John      |
+
+And here is a screenshot of this structure in Microsoft's Visual Studio - it will look quite similar whatever your RDMBS management tool is.
+
+<Image src={rdbms1Image} alt="RDBMS Table 1" />
+
+## SQL - Structured Query Language
+
+SQL is the primary tool you will need when interacting with a database.  The SQL language is like any other language you might know - English, French, Spanish; 
+C#, PHP, Java.  It has a syntax, a grammar, a vocabulary.  Certain words carry certain extremely significant meanings.  What we consider a sentence in spoken 
+language is called a query or statement in SQL (depending on if we're asking for data or if we're giving data to the table).  A complete **query** or **statement** 
+should convey the who/what/when/where/why/how of the data that we want to store, retrieve, or manipulate.  It always helps me think in spoken-language terms 
+for SQL statements; you'll see why in a bit. In order to retrieve (or ask for) data - the focus of this first tutorial - we need to use the `select` keyword 
+to start our query.
+
+## A Select Statement - Querying the Table
+
+Let's try to get some data out of the Writers table above.  The structure of a basic select statement is as follows:
+
+``` SQL
+select column(s) from table
+```
+
+Before we write our query, let's think of what we want in plain speech.  
+
+*"I want to see the first and last names of all of our Writers."*
+
+That statement would look like this:
+
+``` SQL
+select FirstName, LastName from Writers
+```
+
+This should return us all of the data in exactly the format you saw in the table definition above.  Notice that the names of the columns that 
+we want are **separated by a comma.** Also, we see that we are omitting the ID column. **A query should only specify the columns that you are interested 
+in seeing.** Now, let's say
+
+*"I only want to see the last names of all of our Writers."*
+
+We should change our query to:
+
+``` SQL
+select LastName from Writers
+```
+
+This will return a list of records that looks similar to this:
+
+| Last Name |
+|-----------|
+| Carter    |
+| John      |
+
+So far, we have a decently useful query that will retrieve certain columns for every record in the table.  That's neat!  It also provides limited 
+usefulness in a real application.  We don't want to retrieve every record in every case.  The last part of this article is about how to limit our 
+records based on a condition using the **where** keyword.
+
+## Where - Providing Conditions to a Query
+
+Using a query with a condition is one of the most important and most common things you will do as an application developer.  The way we do this is by adding a **where clause**:
+
+``` SQL
+select column(s) from table
+where condition
+```
+
+So lets take our query and add a condition to it.  Our plain-speech query now becomes
+
+*"I want to see the first and last names of Writer number 1."*
+
+Here's the updated query:
+
+``` SQL
+select FirstName, LastName from Writers
+where ID = 1
+```
+
+And our results:
+
+| First Name | Last Name |
+|------------|-----------|
+| Jonathan   | Carter    |
+
+We notice the condition that we specify in our where clause in the format
+
+**column = value**
+
+There are many ways to specify conditions, however those are beyond the scope of this article.  Let's get one more bit of practice using this same format.  Let's change our plain-speech query again:
+
+*"I want to see the Writer ID number for all of our Writers with the last name John."*
+
+Query:
+
+``` SQL
+select ID from Writers
+where LastName = 'John'
+```
+
+Results:
+
+| ID |
+|----|
+| 2  |
+
+The important point here is that **string values need to be surrounded with single quotes, whereas numeric values do not.**  
+
+That's it for now!  Here's a recap/TLDR.
+
+## Recap
+
+- Data lives in a row/column format called a table.  
+- There can be multiple tables in a database.
+- Rows of data, also known as records, are returned when we query a table.
+- Queries are done through use of the select keyword.
+- Records can be limited through use of the where clause.
+- The full format of a query, including a where clause is:
+  ``` SQL
+  select column(s) from table
+  where condition
+  ```

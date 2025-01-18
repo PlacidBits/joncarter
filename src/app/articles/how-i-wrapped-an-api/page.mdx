@@ -1,0 +1,174 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+
+export const article = {
+ author: 'Jonathan Carter',
+ date: '2020-02-27',
+ title: 'How I Wrapped an API',
+ description:
+ "In my day-to-day, I primarily maintain a web API. It&apos;s had limited consumers, but we&apos;re now centralizing a lot of functionality there. The problem we encountered was that only a limited number of developers on the team had experience with RESTful services, or even calling things in general over HTTP from .NET. This post is about the library I created for a team whose primary focus is a Windows Forms app to enable them to interact with our web API using a more familiar paradigm. ",
+}
+
+export const metadata = {
+ title: article.title,
+ description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+In my day-to-day, I primarily maintain a web API. It&apos;s had limited consumers, but we&apos;re now centralizing a lot of functionality there. The problem we encountered was that only a limited number of developers on the team had experience with RESTful services, or even calling things in general over HTTP from .NET. This post is about the library I created for a team whose primary focus is a Windows Forms app to enable them to interact with our web API using a more familiar paradigm. 
+
+You can dive right into the code [here on my github](https://github.com/PlacidBits/wrapping-api).
+
+## The Setup
+
+- Our API is based on Microsoft&apos;s Web API 2, written in .NET Framework 4.6.1. 
+- Our API is not strictly RESTful. Many endpoints are written to handle POSTs when they could more appropriately be GETs, while some GETs should be PUTs, etc. 
+- Our API is protected by OAuth 2. 
+- Our consumer is a Windows Forms app written in .NET 4.5.1. 
+- In the interest of being more accessible to a wider audience, I&apos;ve targeted the example solution in this post to .NET Standard 2.0. If you are interested in seeing the .NET 4.5.1-compatible solution, drop a comment and I&apos;ll be happy to put up an alternative repo. 
+- On our development machines, we want to be able to run an instance of the API and point to that from our local instance of the WinForms app. 
+- We have a private nuget feed available to distribute our solution.
+
+## Desired Usage Scenario
+
+From our client WinForms app, we want the usage to look something like this:
+
+``` csharp
+IApiClient apiClient = new ApiClient(ApiEnvironment.Test);
+```
+
+And while we&apos;re making enhancements locally, we want to be able to specify the URL of our API like this:
+
+``` csharp
+IApiClient apiClient = new ApiClient(ApiEnvironment.Dev, "http://localhost:5000/");
+```
+
+Then, we want to call our operations like so:
+
+``` csharp
+var responseDto = await apiClient.CheckHealth();
+```
+
+## Architecture
+
+We start our modeling with an `ApiClient` class and an accompanying interface. The key pieces that work with the `ApiClient` class are the DTOs, Operations, and Exceptions. 
+
+### ApiClient
+
+This is the main class our consumers will be interacting with. It exposes:
+
+- A method used to set the environment at runtime
+  - In our case, this was useful due to our WinForms app being able to switch to the test environment on the fly.
+- A property that tells us what the currently-targeted API environment is.
+- All of the operations.
+
+We&apos;ll use the matching interface `IApiClient` to create a singleton instance of this class using a dependency injection framework so that the underlying `HttpClient` and 
+associated handler are kept alive the way they need to be.
+
+### DTOs
+
+These are POCOs which acts as the common contract between the consumer(s) and our API. They&apos;re kept in their own separate project so that we can package and publish them 
+separately. We&apos;ll talk more in detail about this in the Packaging section.
+
+### Operations
+
+Here, we start with a `BaseOperation` which holds all of the major logic having to do with calling out to the API, handling retries (using Polly), and validating the response - handling 
+exceptions when necessary. The `BaseOperation` is abstract and takes the `TRequest` and `TResponse` generic parameters. This class makes it simple to implement any endpoint as its own Operation.
+
+Each of these inherits the BaseOperation and represents an endpoint. In doing so, the Operation is required to implement the abstract Call(TRequest) method. In our example 
+`HealthCheckOperation`, we demonstrate using an optional parameter if a request object is unecessary as in cases of RESTful GET requests. Some more examples are available in the Extending section below.
+
+All of the operations are internal, not exposed to consumers. The `IApiClient` interface will be where we choose how to expose these operations to API consumers.
+
+### Exceptions
+
+We have two exceptions which can be handled by the library user:
+- ApiSecurityException
+  - Thrown when there is an error when obtaining an OAuth token.
+- ApiCallException
+  - Thrown when an unsuccessful response is returned and otherwise unhandled.
+
+When thrown, both of these exception types will contain the inner exception.
+
+## Extending
+
+When implementing a new endpoint, create an operation class which inherits the `BaseOperation<TRequest, TResponse>` where `TRequest` is the request DTO type and `TResponse` is the response DTO type. 
+
+Example:
+
+``` csharp
+class MyOperation : BaseOperation<SomeNewRequestDto, SomeNewResponseDto>
+{
+ 
+}
+```
+
+Note that, even if you don&apos;t need to send a request body (in the case of a GET) or expect a response body back (in the case of a DELETE), you should still use object as the `TRequest` or `TReponse` as needed. 
+
+You must have one constructor with the signature `(HttpClient, string, Func<Task>)` and pass those parameters through to the base constructor.
+
+Example:
+
+``` csharp
+class MyOperation : BaseOperation<SomeNewRequestDto, SomeNewResponseDto>
+{
+ public MyOperation(HttpClient apiClient, string apiBaseAddress, Func<Task> refreshAccessToken)
+ : base(apiClient, apiBaseAddress, refreshAccessToken)
+ 
+}
+```
+
+Finally, you must implement the `Task<TResponse> Call(TRequest)` method. This can be done very simply using the base&apos;s `ApiClient` object and `ExecuteAsync` function.
+
+This ensures that the   BaseOperation` will have everything it needs for retries and token-refreshing. 
+
+Once that&apos;s done, you&apos;ll just need to implement the `Task<TResponse> Call(TRequest)` method. This can be done very simply using the base&apos;s `ApiClient` object and `ExecuteAsync` function. 
+
+Example:
+
+``` csharp
+class MyOperation : BaseOperation<SomeNewRequestDto, SomeNewResponseDto>
+{
+ public MyOperation(HttpClient apiClient, string apiBaseAddress, Func<Task> refreshAccessToken)
+ : base(apiClient, apiBaseAddress, refreshAccessToken)
+ {
+ 
+ }
+ 
+ public override Task<SomeNewResponseDto> Call(SomeNewRequestDto dto = null) => 
+  this.ExecuteAsync(this.ApiClient.GetAsync(this.ApiBaseAddress + "some/endpoint"));
+}
+```
+
+A couple things to note here:
+
+1. The optional parameter dto is how you would handle sending a request that needs no body.
+2. The ApiClient is just an instance of System.Net.Http.HttpClient, so you have access to all of those methods for GET, POST, PUT, DELETE. 
+
+Once the operation is made, we just need to expose it through the `IApiClient` interface and call it inside of `ApiClient`. 
+
+``` csharp
+// ApiClient.cs
+
+public Task<SomeNewResponseDto> DoNewOperationAsync(SomeNewRequestDto dto) =>
+ new MyOperation(_apiClient, _apiBaseAddress, the.RefreshAccessTokenAsync).Call(dto);
+```
+
+## Packaging
+
+When distributing our new library, we want to make the client with its operations available separately from the DTOs they rely on. This way, we can have the 
+following references in our respective projects:
+
+- Web API
+  - References API.DTOs package in order to return these types from the controller methods
+- Consumer App
+  - References API.Client package in order to instantiate a client and access all of the operations we&apos;ve defined.
+  - References API.DTOs package in order to work with the operations in the same manner they are exposed from the API. 
+
+This is why we&apos;ve created them as two separate projects in our example repo. 
+
+## Conclusion
+
+This was a fun exercise in OOP and code reuse for us. Do you see something we can do differently? Let us know on our socials!
+
+Thanks for reading! 

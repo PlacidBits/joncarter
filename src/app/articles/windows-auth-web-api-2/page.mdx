@@ -1,0 +1,41 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+
+export const article = {
+ author: 'Jonathan Carter',
+ date: '2015-12-22',
+ title: 'Windows Authentication and Web API 2',
+ description:
+ "I've recently had a situation come up at work where I need to protect our ASP.NET Web API 2 deployment with Windows Authentication. We run our web client through Chrome and IE and we needed the NTLM negotiation to be handled gracefully. There are a few things that we had to put in place to get this to go. Here they are in list form.",
+}
+
+export const metadata = {
+ title: article.title,
+ description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+I've recently had a situation come up at work where I need to protect our ASP.NET Web API 2 deployment with 
+Windows Authentication. We run our web client through Chrome and IE and we needed the NTLM negotiation to 
+be handled gracefully. There are a few things that we had to put in place to get this to go. Here they are 
+in list form. The code for both the problem and the solution is [here on my github](https://github.com/PlacidBits/ntlmChrome).
+
+- API
+  - Add a custom header to the web config to allow the client to send us credentials
+    - Access-Control-Allow-Credentials
+  - Design a mechanism to configure allowed origins and respond to each request from acceptable domains with a proper Access-Control-Allow-Origin header value
+    - The approach I've taken is to:
+      - Create a [custom config section](https://github.com/PlacidBits/ntlmChrome/blob/master/TheSolution/Api/Web.config) to hold the acceptable domains
+      - Create a [custom handler](https://github.com/PlacidBits/ntlmChrome/blob/master/TheSolution/Api/Handlers/AllowedOriginHandler.cs) to pipe every request through
+      - [Register the handler](https://github.com/PlacidBits/ntlmChrome/blob/master/TheSolution/Api/App_Start/WebApiConfig.cs) in App_Start
+- Javascript client
+  - Send ajax requests "withCredentials"
+    - In [jquery](http://api.jquery.com/jquery.ajax/), you can do this with the `xhrFields` property of the configuration object.
+    - In [angular](https://docs.angularjs.org/api/ng/service/$http), you can use the `withCredentials` property of the configuration object with the `$http` service.
+
+That's it! 
+
+UPDATE 3/2/2016:
+
+When using angular, it's not necessary to send that config object per-request. I've modified the code on my 
+github to show that the `$httpProvider` object can be configured to send credentials on every http request by default.

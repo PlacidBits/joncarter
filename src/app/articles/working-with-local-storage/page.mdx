@@ -1,0 +1,134 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import localStorageImage from './localStorage.png'
+
+export const article = {
+ author: 'Jonathan Carter',
+ date: '2014-10-21',
+ title: 'Working with JavaScript Local Storage',
+ description:
+  "This is a small intro to using one of the fun new(ish) HTML5 APIs - Web Storage. I'll be focusing on the localStorage API, but there are also sessionStorage and indexedDB that you might consider using in your application.",
+}
+
+export const metadata = {
+ title: article.title,
+ description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+This is a small intro to using one of the fun new(ish) HTML5 APIs - Web Storage. I'll be focusing on the localStorage API, but there are also sessionStorage and indexedDB that you might consider using in your application. [Here's the fiddle](http://jsfiddle.net/PlacidBits/d1q6vffw/) for what I'm going to be talking about.
+
+## What is localStorage?
+
+The localStorage object represents a key-value store; also known to some as an associative array. Its purpose is to **let you store application data on the client machine.**
+
+The localStorage object (technically, the underlying store) is domain-specific, meaning that websites cannot look into each others' stores on the client machine. This means, too, that every page in your domain can access this store, enabling you to share data across pages (and refreshes of the same page) without resorting to server-side session, or things like .NET ViewState. The store will persist all values **even when the tab or browser is closed.**
+
+Also of note is that the size limit is far greater than that of a cookie - the object we may have used in the place of localStorage in earlier web days. According to the W3C spec, there is no maximum capacity for localStorage, however the common browser implementation seems to impose a limit of 5MB. You'll know you hit the cap when you see a QUOTA_EXCEEDED_ERR get thrown in your console. Speaking of browsers, [here's a breakdown](http://caniuse.com/#search=localstorage) of browser compatibility for the localStorage methods (even IE8?!). I'll only be discussing implementation in modern browsers (IE10+, Webkit browsers, Gecko browsers).
+
+## How to Use It
+
+### Method 1 - Method Calling (Preferred)
+
+``` JavaScript
+//setItem(key, value)
+localStorage.setItem("itemName", itemValue);
+//getItem(key)
+var item = localStorage.getItem("itemName");
+```
+
+The most standards-compliant, expressive way to store and retrieve values from localStorage. 
+
+### Method 2 - Array Notation
+
+``` JavaScript
+//localStorage[key] = value
+localStorage["itemName"] = itemValue;
+//localStorage[key]
+var item = localStorage["itemName"];
+```
+
+It may help to use this notation if you're compelled to keep the key-value nature of the localStorage object obvious in your code. For me, this slightly obfuscates the fact that localStorage is itself an object, and not truly an array. 
+
+### Method 3 - Object properties
+
+``` JavaScript
+localStorage.itemName = itemValue;
+var item = localStorage.itemName;
+```
+
+This syntax might be preferred among those who really like to think of things in terms of objects. It's terse and extremely convenient. I tend to shy away from this method, only because I feel like I won't remember the key-value nature of the backing store and get caught up in some weird error during debugging. I'm sure it's an unfounded fear, but it's a personal preference. 
+
+[Here's a fiddle](http://jsfiddle.net/PlacidBits/d1q6vffw/) with all three methods. In Chrome, you can use your dev tools' Resources tab to watch value populate!
+
+<Image src={localStorageImage} alt="localStorage in Chrome Dev Tools" />
+
+## Storing Objects
+
+When I first heard about this API, I immediately thought to start storing all of my JSON data there as a cached version of certain REST calls that I only seldom needed to make. You might think (as I did) that doing so should be as straightforward as this:
+
+``` JavaScript
+var myObject = {
+ name: "Jon",
+ url: "http://placidbits.com"
+};
+
+localStorage.setItem("profileData", myObject);
+```
+
+This does not work. The reason is simple and reasonable: localStorage can only store string data. Thankfully, browsers today can help us solve this natively by making available the JSON.stringify() and JSON.parse() methods. These will convert our objects into their JSON string representation, thus allowing us to store them. The implementation looks like this:
+
+``` JavaScript
+//Storing
+var myObject = {
+ name: "Jon",
+ url: "http://placidbits.com"
+};
+
+localStorage.setItem("profileData", JSON.stringify(myObject));
+
+//Retreival
+var profileData = JSON.parse(localStorage.getItem("profileData"));
+```
+
+It's important to remember to `JSON.parse()` the object on the way out of the store in order to "dot into" our objects again later on in the app. 
+
+## Special Consideration
+
+The necessity for data to be converted into a string on the way into the store could mean big performance problems when trying to work with high volumes of numeric data. Both the CPU time when parsing an int or float out of our strings, and the size of a string compared to a numeric value could mean slowdown or browser crashes if you're not careful and deliberate about what you store there. 
+
+## Clearing Out the Data
+
+``` JavaScript
+//Delete one value
+//removeItem(key)
+localStorage.removeItem("profileData");
+
+//Clear allllllll of the values you've stored for this domain
+localStorage.clear();
+```
+
+It's that simple! 
+
+## Extra - Eventing
+
+You are allowed to attach an event handler to the storage event. Here's an example using vanilla javascript:
+
+``` JavaScript
+window.addEventListener("storage", handleStorage);
+```
+
+You can also use jQuery or whatever other frameworks you like to attach a method to the event. The definition of `handleStorage()` should look like this:
+
+``` JavaScript
+function handleStorage(event){
+ var key = event.key;
+ var oldValue = event.oldValue;
+ var newValue = event.newValue;
+ var url = event.url;
+}
+```
+
+The StorageEvent object that gets passed to the handler has the above four properties on it. Most of these are self-explanatory. 
+The `key` is the key of the object that was changed in the event. The `oldValue` is the value that was stored at that key in the localStorage store prior 
+to the event being triggered. The `newValue` is the value being set at the key. The url is the url of the page that triggered the event.

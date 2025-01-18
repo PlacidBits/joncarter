@@ -1,0 +1,46 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+
+export const article = {
+ author: 'Jonathan Carter',
+ date: '2016-09-09',
+ title: 'Windows Authentication and Web API 2',
+ description:
+ "A coworker of mine had an interesting problem regarding cross-browser javascript dates.",
+}
+
+export const metadata = {
+ title: article.title,
+ description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+A quick one!
+
+A coworker of mine had an interesting problem regarding cross-browser javascript dates.
+
+Does this look fine to you?
+
+``` javascript
+new Date('2016-08-29T14:42:07.56')
+```
+
+It looks fine to me. It turns our it's not fine. In order for this code to return you an expected datetime across browsers (in our case Chrome and IE), we should specify either a timezone or a specific offset. Since we didn't particularly care to add a specific offset, we used
+
+``` javascript
+new Date('2016-08-29T14:42:07.56Z')
+``` 
+
+Yep, we just slapped a "Z" on there. Apparently, "Z" is a zero-time UTC offset (-00:00). 
+
+This happens because Chrome assumes an unspecified date to be a UTC time with a zero-offset, while IE assumes the timezone should be the same timezone of the client machine (in our case, EST, -05:00).
+
+If you wanted to specify your particular locale's offset, you could construct the date this way:
+
+``` javascript
+new Date('2016-08-29T14:42:07.56Z-05:00')
+```
+
+Thanks to Moshe Karmel for the advice! 
+
+For reasons like this, I tend to use [momentjs](http://momentjs.com/) for basically everything having to do with dates. 
