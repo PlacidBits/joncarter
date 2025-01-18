@@ -56,18 +56,18 @@ export default function Uses() {
           </Tool>
           <Tool title="LG UltraGear 32-inch OLED Gaming Monitor (32GS95UE) 4k, 240Hz AND 1080p, 480Hz">
             An unbelievable gaming monitor that also happens to also be great for productivity. I tend to use it at 4k 240Hz for buttery smooth productivity.
-            Before buying it, I was worried about the general sentiment that OLED monitors weren't so great if one intends to mostly stare at text all day (such as code).
-            I'm happy to say though that this sub-pixel layout has not been an issue for me at all. The colors are vibrant, and the text is clear with no jaggies.
+            Before buying it, I was worried about the general sentiment that OLED monitors weren&apos;t so great if one intends to mostly stare at text all day (such as code).
+            I&apos;m happy to say though that this sub-pixel layout has not been an issue for me at all. The colors are vibrant, and the text is clear with no jaggies.
           </Tool>
           <Tool title="Custom QwertyKeys QK100">
-            I'm a bit of a keyboard snob these days. I put this barebones kit together with:
+            I&apos;m a bit of a keyboard snob these days. I put this barebones kit together with:
             - Gateron Oil King switches
             - CeraKeys White-on-Black ceramic keycaps
             - Plate foam and case foam installed
           </Tool>
           <Tool title="Logitech MX Master 3S">
-            The now and forever reigning champion of productivity mice. I've tried a lot of other mice - mostly gaming ones - but I always come back to this one when 
-            it comes time to get work done. If it's time to get some sweaty gaming sessions in, I switch off to...
+            The now and forever reigning champion of productivity mice. I&apos;ve tried a lot of other mice - mostly gaming ones - but I always come back to this one when 
+            it comes time to get work done. If it&apos;s time to get some sweaty gaming sessions in, I switch off to...
           </Tool>
           <Tool title="Logitech G Pro X Superlight 2">
             Light as a feather with great tracking. In conjuntion with a PowerPlay mat, I can wirelessly click away.
@@ -80,27 +80,27 @@ export default function Uses() {
           </Tool>
           <Tool title="JetBrains Rider">
             As a C#/.NET enthusiast, without the budget for a full commercial Visual Studio license, Rider is the perfect solution.
-            With much more affordable individual licenses and quick update cycles to support new evolutions in the .NET ecosystem, I can't recommend it enough.
+            With much more affordable individual licenses and quick update cycles to support new evolutions in the .NET ecosystem, I can&apos;t recommend it enough.
           </Tool>
           <Tool title="Sublime Text 4">
             Once the king of editing for me, this is now my trusted scratchpad. Not having to save my work to any particular file while it keeps the content in 
             my buffers even between restarts is truly invaluable - especially in more scatterbrained scenarios such as looking deadlines.
           </Tool>
           <Tool title="Windows Terminal">
-            Windows Terminal hosts my terminals. Being on a Windows-based machine, I don't see as I have a choice for this one.
+            Windows Terminal hosts my terminals. Being on a Windows-based machine, I don&apos;t see as I have a choice for this one.
           </Tool>
           <Tool title="WSL2 (Windows Subsystem for Linux)">
             Windows does not stop me from having access to the best dev tooling out there anymore!
             The default profile that I load in Windows Terminal.
           </Tool>
           <Tool title="Oh My Posh">
-            Customizing the terminal prompt is a right of passage for any developer. Oh My Posh makes it easy to make my terminal look pretty whether I'm in 
+            Customizing the terminal prompt is a right of passage for any developer. Oh My Posh makes it easy to make my terminal look pretty whether I&apos;m in 
             Powershell or Ubuntu on WSL2.
           </Tool>
         </ToolsSection>
         <ToolsSection title="Design">
           <Tool title="Excalidraw">
-            I love a good flowchart. Excalidraw is the best tool I've found for making them. It's simple, fast, and the output looks great.
+            I love a good flowchart. Excalidraw is the best tool I&apos;ve found for making them. It&apos;s simple, fast, and the output looks great.
           </Tool>
           <Tool title="Draw.io (now diagrams.net)">
             Like Excalidraw, but for when I need swimlanes.
