@@ -1,9 +1,6 @@
 import { type Metadata } from 'next'
-import Image from 'next/image'
-
 import { Card } from '@/components/Card'
 import { SimpleLayout } from '@/components/SimpleLayout'
-import { link } from 'fs'
 
 const projects = [
   {

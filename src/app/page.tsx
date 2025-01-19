@@ -13,13 +13,8 @@ import logoBelleTire from '@/images/logos/belle-tire.svg'
 import logoRocketMortgage from '@/images/logos/rocket-mortgage.svg'
 import logoXpo from '@/images/logos/xpo.svg'
 import logoShiftDigital from '@/images/logos/shift-digital.svg'
-import image1 from '@/images/photos/image-1.jpg'
-import image2 from '@/images/photos/image-2.jpg'
-import image3 from '@/images/photos/image-3.jpg'
-import image4 from '@/images/photos/image-4.jpg'
-import image5 from '@/images/photos/image-5.jpg'
 import floridaImage from "@/images/photos/florida.jpg";
-import coffeeImage from "@/images/photos/coffee.jpg";
+import coffeeImage from "@/images/photos/coffee-time.jpg";
 import jamaicaImage from "@/images/photos/jamaica.jpg";
 import brisketImage from "@/images/photos/brisket.jpg";
 import keyboardsImage from "@/images/photos/keyboards.jpg";
