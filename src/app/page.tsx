@@ -18,6 +18,11 @@ import image2 from '@/images/photos/image-2.jpg'
 import image3 from '@/images/photos/image-3.jpg'
 import image4 from '@/images/photos/image-4.jpg'
 import image5 from '@/images/photos/image-5.jpg'
+import floridaImage from "@/images/photos/florida.jpg";
+import coffeeImage from "@/images/photos/coffee.jpg";
+import jamaicaImage from "@/images/photos/jamaica.jpg";
+import brisketImage from "@/images/photos/brisket.jpg";
+import keyboardsImage from "@/images/photos/keyboards.jpg";
 import { type ArticleWithSlug, getAllArticles } from '@/lib/articles'
 import { formatDate } from '@/lib/formatDate'
 
@@ -241,7 +246,7 @@ function Resume() {
           <Role key={roleIndex} role={role} />
         ))}
       </ol>
-      <Button href="#" variant="secondary" className="group mt-6 w-full">
+      <Button href="https://1drv.ms/w/c/f316a31877c9899a/EZqJyXcYoxYggPO8LAEAAAABfsEcuMfhc-oh46s0wcF6qQ?e=RLUrZI" variant="secondary" className="group mt-6 w-full">
         Download Resumé
         <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
       </Button>
@@ -255,7 +260,7 @@ function Photos() {
   return (
     <div className="mt-16 sm:mt-20">
       <div className="-my-4 flex justify-center gap-5 overflow-hidden py-4 sm:gap-8">
-        {[image1, image2, image3, image4, image5].map((image, imageIndex) => (
+        {[floridaImage, coffeeImage, jamaicaImage, brisketImage, keyboardsImage].map((image, imageIndex) => (
           <div
             key={image.src}
             className={clsx(
@@ -292,12 +297,12 @@ export default async function Home() {
           </p>
           <div className="mt-6 flex gap-6">
             <SocialLink
-              href="#"
+              href="https://github.com/placidbits"
               aria-label="Follow on GitHub"
               icon={GitHubIcon}
             />
             <SocialLink
-              href="#"
+              href="https://www.linkedin.com/in/jonathan-b-carter/"
               aria-label="Follow on LinkedIn"
               icon={LinkedInIcon}
             />
