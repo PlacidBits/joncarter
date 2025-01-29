@@ -10,12 +10,12 @@ const projects = [
     link: { href: 'https://belletire.com', label: 'belletire.com' },
   },
   {
-    name: 'Placidbits',
+    name: 'PlacidBits',
     description: `My company's site! Currently undergoing a rebrand as well as a restructure, but still was a lot of fun to explore platform options with CMS providers.`,
     link: { href: 'https://www.placidbits.com', label: 'placidbits.com' },
   },
   {
-    name: 'Placidbits.Console',
+    name: 'PlacidBits.Console',
     description: `A publicly availavle nuget package for those who have a niche need to create a .NET console application with boilerplate taken care of. 
     Comes with dependency injection, parallel task runs, opinionated logging, data provision, and a simple extension setup.`,
     link: { href: 'https://github.com/PlacidBits/PlacidBits.Console', label: 'github.com' },
