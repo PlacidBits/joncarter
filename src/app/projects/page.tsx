@@ -45,7 +45,7 @@ const projects = [
     name: 'Baby Shower Guestbook 1',
     description:
       'A little guestbook site for some close friends who were expecting.',
-    link: { href: 'https://affectionate-ramanujan-916e6f.netlify.app/', label: 'netlify.com' },
+    link: { href: 'https://layniemaclin.netlify.app/', label: 'netlify.com' },
   },
 ]
 
