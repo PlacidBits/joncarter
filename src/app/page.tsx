@@ -241,7 +241,7 @@ function Resume() {
           <Role key={roleIndex} role={role} />
         ))}
       </ol>
-      <Button href="https://1drv.ms/w/c/f316a31877c9899a/EZqJyXcYoxYggPO8LAEAAAABfsEcuMfhc-oh46s0wcF6qQ?e=RLUrZI" variant="secondary" className="group mt-6 w-full">
+      <Button href="https://1drv.ms/w/c/f316a31877c9899a/EZepF6gja2pEkoJ6517eRU8B4Ejwx2MEz5KF71uhC2YrwA?e=eRynON" variant="secondary" className="group mt-6 w-full">
         Download Resumé
         <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
       </Button>
