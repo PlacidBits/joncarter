@@ -287,7 +287,7 @@ export default async function Home() {
             Tech Lead, Software Engineer, Founder, Lover of Food.
           </h1>
           <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
-          I&apos;m Jonathan Carter, a software enthusiast and entrepreneur based in Detroit, MI. I&apos;m the founder of PlacidBits, where we develop technological solutions that empower people and businesses to realize their vision.
+          I&apos;m Jonathan Carter, a software enthusiast and entrepreneur based in Detroit, MI. I&apos;m the founder of PlacidBits, where we develop technological solutions that empower people and businesses to realize their visions.
           I also co-founded Niibble, where our mission is to make it easy for anyone in the world to share their love of food. 
           </p>
           <div className="mt-6 flex gap-6">

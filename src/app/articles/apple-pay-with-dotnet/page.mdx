@@ -56,7 +56,8 @@ public async Task GetSessionAsync(string validationUrl = null)
     {
       userCaStore.Open(OpenFlags.ReadOnly);
       X509Certificate2Collection certificatesInStore = userCaStore.Certificates;
-      X509Certificate2Collection findResult = certificatesInStore.Find(X509FindType.FindByThumbprint, certThumbprint, false);
+      X509Certificate2Collection findResult = 
+        certificatesInStore.Find(X509FindType.FindByThumbprint, certThumbprint, false);
       X509Certificate2 clientCertificate = null;
       if (findResult.Count == 1)
       {
